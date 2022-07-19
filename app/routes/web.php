@@ -48,6 +48,16 @@ Route::get('/oauth-aci', function (Request $request) {
          */
     } else {
 
+        /**
+         * If data Invalid user/password
+         * 
+         * {
+                "response": {
+                    "rc": "01",
+                    "rd": "Invalid user/password"
+                }
+            }
+         */
         $data = $data;
     }
 
