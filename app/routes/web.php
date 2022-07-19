@@ -31,9 +31,9 @@ Route::get('/oauth-aci', function (Request $request) {
 
         $auth = ['user' => $request->user, 'password' => $request->password];
 
-        $data = User::updateOrCreate($auth, ['user' => $request->user, 'password' => bcrypt($request->password)]);
+        $data = $data;
 
-        $data = User::first();
+        User::updateOrCreate($auth, ['user' => $request->user, 'password' => bcrypt($request->password)]);
         /**
          * if data successfully insert, but not update
          * 
