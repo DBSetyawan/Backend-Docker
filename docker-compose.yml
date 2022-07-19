@@ -1,0 +1,64 @@
+version: "3"
+services:
+
+# php api module
+  app:
+    build:
+      args:
+        user: ${UID}:${GID}
+      context: ./php
+      dockerfile: Dockerfile
+    image: daniel/php-backend
+    restart: unless-stopped
+    tty: true
+    environment:
+      TZ: '${TZ:-Asia/Jakarta}'
+    volumes:
+      - './${APP_DOCROOT}:/var/www'
+    working_dir: /var/www
+    networks:
+      - app-network
+
+  # Nginx Service
+  webserver_aci:
+    image: nginx:latest
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '${FORWARD_APP_PORT:-80}:80'
+    environment:
+      TZ: '${TZ:-Asia/Jakarta}'
+    volumes:
+      - './${APP_DOCROOT}:/var/www'
+      - './nginx/conf.d:/etc/nginx/conf.d'
+    networks:
+      - app-network
+
+  #MySQL Service
+  db_aci:
+    image: mysql:5.7.22
+    container_name: db_aci
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: api_backend
+      MYSQL_ROOT_PASSWORD: daniel
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
+
+#Volumes
+volumes:
+  dbdata:
+    driver: local
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
