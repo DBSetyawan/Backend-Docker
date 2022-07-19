@@ -31,7 +31,7 @@ Route::get('/oauth-aci', function (Request $request) {
 
         $auth = ['user' => $request->user, 'password' => $request->password];
 
-        $data = User::updateOrCreate($auth, ['user' => $request->user, 'password' => $request->password]);
+        $data = User::updateOrCreate($auth, ['user' => $request->user, 'password' => bcrypt($request->password)]);
 
         $data = User::first();
         /**
@@ -60,6 +60,25 @@ Route::get('/oauth-aci', function (Request $request) {
          */
         $data = $data;
     }
+
+    return response()->json(['response' => $data]);
+});
+
+/**
+ * @method prepared data list
+ * @authenticated
+ */
+Route::get('/list-data', function (Request $request) {
+
+    $client = new Client([
+        'headers' => ['Content-Type' => 'application/json']
+    ]);
+
+    $response = $client->get(
+        'https://devel.bebasbayar.com/web/test_programmer.php'
+    );
+
+    $data = json_decode($response->getBody()->getContents(), true);
 
     return response()->json(['response' => $data]);
 });
